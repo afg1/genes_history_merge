@@ -14,6 +14,8 @@
 # Create log directory
 mkdir -p logs
 
+source .env
+
 # Activate virtual environment if it exists
 if [ -d "venv" ]; then
     source venv/bin/activate
