@@ -21,6 +21,8 @@ echo "Working directory: $(pwd)"
 # module load singularity/3.8.0
 # module load python/3.9
 
+source .env
+
 # Set environment variables
 export SINGULARITYENV_APPEND_PATH=/hps/nobackup/agb/rnacentral/genes-testing/bin
 
