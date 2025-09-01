@@ -20,6 +20,7 @@ echo "Working directory: $(pwd)"
 # Load required modules
 module load python/3.11.2
 
+
 # Activate virtual environment if it exists
 if [ -d "venv" ]; then
     source venv/bin/activate
@@ -29,6 +30,7 @@ fi
 if [ -f ".env" ]; then
     source .env
 fi
+
 
 # Set environment variables
 export SINGULARITYENV_APPEND_PATH=/hps/nobackup/agb/rnacentral/genes-testing/bin
