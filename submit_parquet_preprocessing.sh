@@ -23,6 +23,11 @@ echo "Working directory: $(pwd)"
 
 source .env
 
+# Activate virtual environment if it exists
+if [ -d "venv" ]; then
+    source venv/bin/activate
+fi
+
 # Set environment variables
 export SINGULARITYENV_APPEND_PATH=/hps/nobackup/agb/rnacentral/genes-testing/bin
 
