@@ -1,17 +1,17 @@
 #!/bin/bash
-#SBATCH --job-name=preprocess_parquet
+#SBATCH --job-name=classify_genes
 #SBATCH --array=0-15%4
 #SBATCH --cpus-per-task=4
-#SBATCH --mem=24G
+#SBATCH --mem=16G
 #SBATCH --time=48:00:00
 #SBATCH --partition=standard
-#SBATCH --output=logs/feature_preprocess_%A_%a.out
-#SBATCH --error=logs/feature_preprocess_%A_%a.err
+#SBATCH --output=logs/gene_classification_%A_%a.out
+#SBATCH --error=logs/gene_classification_%A_%a.err
 
-# Feature preprocessing for transcript parquet files
-# This script processes transcript parquet files to generate features for classification
+# Gene classification using a pre-trained model
+# This script runs the classification for pairs of transcript and feature parquet files
 
-echo "Starting feature preprocessing array job"
+echo "Starting gene classification array job"
 echo "Array task ID: $SLURM_ARRAY_TASK_ID"
 echo "Job ID: $SLURM_JOB_ID"
 echo "Node: $SLURMD_NODENAME"
@@ -41,7 +41,7 @@ if [ -z "$PGDATABASE" ]; then
 fi
 
 # Create logs directory if it doesn't exist
-mkdir -p logs/feature_preprocessing
+mkdir -p logs/gene_classification
 
 # Check if singularity image exists
 SINGULARITY_IMAGE="/hps/nobackup/agb/rnacentral/genes-testing/gff2genes/rnacentral-rnacentral-import-pipeline-latest.sif"
@@ -50,10 +50,10 @@ if [ ! -f "$SINGULARITY_IMAGE" ]; then
     exit 1
 fi
 
-# Check if SO embedding model exists
-SO_MODEL_PATH="/hps/nobackup/agb/rnacentral/genes-testing/gff2genes/so_embedding_model.emb"
-if [ ! -f "$SO_MODEL_PATH" ]; then
-    echo "ERROR: SO embedding model not found: $SO_MODEL_PATH"
+# Check if classification model exists
+MODEL_PATH="/hps/nobackup/agb/rnacentral/genes-testing/gff2genes/genes_rf_model.onnx"
+if [ ! -f "$MODEL_PATH" ]; then
+    echo "ERROR: Classification model not found: $MODEL_PATH"
     exit 1
 fi
 
@@ -64,26 +64,26 @@ echo "  Memory: $SLURM_MEM_PER_NODE MB"
 echo "  Time limit: $SLURM_TIMELIMIT"
 echo "  Partition: $SLURM_JOB_PARTITION"
 
-# Run the preprocessing
-echo "Running feature preprocessing..."
-echo "Command: python preprocess_parquet.py"
+# Run the classification
+echo "Running gene classification..."
+echo "Command: python classify_genes.py"
 
-python preprocess_parquet.py
+python classify_genes.py
 
 exit_code=$?
 
-echo "Feature preprocessing completed with exit code: $exit_code"
+echo "Gene classification completed with exit code: $exit_code"
 echo "End time: $(date)"
 
 # Print summary if successful
 if [ $exit_code -eq 0 ]; then
-    echo "Checking for generated feature files in data/ directories..."
-    feature_count=$(find data/ -name "*_features.parquet" 2>/dev/null | wc -l)
-    echo "Total feature files found: $feature_count"
-    
-    if [ $feature_count -gt 0 ]; then
-        echo "Recent feature files:"
-        find data/ -name "*_features.parquet" -exec ls -lh {} \; | tail -5
+    echo "Checking for generated classification output directories..."
+    output_dir_count=$(find data/ -name "*_genes_output" 2>/dev/null | wc -l)
+    echo "Total output directories found: $output_dir_count"
+
+    if [ $output_dir_count -gt 0 ]; then
+        echo "Recent output directories:"
+        find data/ -name "*_genes_output" -exec ls -ldh {} \; | tail -5
     fi
 fi
 
