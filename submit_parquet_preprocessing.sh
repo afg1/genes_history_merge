@@ -18,8 +18,8 @@ echo "Node: $SLURMD_NODENAME"
 echo "Working directory: $(pwd)"
 
 # Load required modules
-module load singularity/3.8.0
-module load python/3.9
+# module load singularity/3.8.0
+# module load python/3.9
 
 # Set environment variables
 export SINGULARITYENV_APPEND_PATH=/hps/nobackup/agb/rnacentral/genes-testing/bin
